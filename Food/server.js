@@ -49,28 +49,18 @@ app.post('/login', async (req, res) => {
 });
 app.put('/update/:id', async (req, res) => {
     const { id } = req.params
-    const { email, name, password, newPassword } = req.body
     try {
-        const userExist = await User.findById({ _id: id })
-        const realpassword = await bcrypt.compare(password, userExist.password)
-        if (!userExist || !realpassword) {
-            return res.send({ message: "User not found" })
-        }
-        const newpassword = await bcrypt.hash(newPassword, 10)
-        userExist.email = email;
-        userExist.name = name;
-        userExist.password = newpassword;
-        userExist.save();
-        res.send({ message: "User Updated Successfully" })
+        const userExist=await User.findById({_id:id})
+        if(!userExist){
+            return res.send({message:"User not found"})
+        }   
+        const updatedData = await User.findByIdAndUpdate({ _id: id }, req.body, { new: true })
+        res.send("User Updated Successfully",updatedData) 
     }
     catch (err) {
         res.send(err)
     }
 })
-
-
-
-
 
 app.delete('/delete/:id', async (req, res) => {
     const { id } = req.params

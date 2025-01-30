@@ -30,57 +30,61 @@ app.post('/register', async (req, res) => {
 })
 
 
-app.post('/login',async(req,res)=>{
-    const {email,password}=req.body;
-    try{
-        const userExist=await User.findOne({email})
-        const realpassword=await bcrypt.compare(password,userExist.password)
-        if(!userExist){
-          return       res.send({message:"User Not Found"})
+app.post('/login', async (req, res) => {
+    const { email, password } = req.body;
+    try {
+        const userExist = await User.findOne({ email })
+        const realpassword = await bcrypt.compare(password, userExist.password)
+        if (!userExist) {
+            return res.send({ message: "User Not Found" })
         }
-        if(realpassword){
-            return res.send({message:"Login Successfully"})
+        if (realpassword) {
+            return res.send({ message: "Login Successfully" })
         }
-       res.send({message:"Invalid Credentials"})
+        res.send({ message: "Invalid Credentials" })
     }
-    catch(err){
+    catch (err) {
         res.send(err)
     }
 })
-
-app.put('/update/:id',async(req,res)=>{
-    const {id}=req.params
-    const {email,name,password}=req.body
-
-    try{
-        const userExist=await User.findById({_id:id})
-        if(!userExist){
-            return res.send({message:"User Not Found"})
+app.put('/update/:id', async (req, res) => {
+    const { id } = req.params
+    const { email, name, password,newPassword } = req.body
+    try {
+        const userExist = await User.findById({ _id: id })
+        const realpassword = await bcrypt.compare(password, userExist.password)
+        if (!userExist || !realpassword) {
+                return res.send({ message: "User not found" })
         }
-        userExist.email=email;
-        userExist.name=name;
-        userExist.password=password;
+        const newpassword = await bcrypt.hash(newPassword, 10)
+        userExist.email = email;
+        userExist.name = name;
+        userExist.password = newpassword;
         userExist.save();
-        res.send({message:"User Updated Successfully"})
+        res.send({ message: "User Updated Successfully" })
     }
-    catch(err){
+    catch (err) {
         res.send(err)
     }
 })
 
-app.delete('/delete/:id',async (req,res)=>{
-    const {id}=req.params
 
-    try{
-        const userExist=await User.findByIdAndDelete({_id:id})
-        if(!userExist){
-                return res.send({message:"User not found "})
+
+
+
+app.delete('/delete/:id', async (req, res) => {
+    const { id } = req.params
+
+    try {
+        const userExist = await User.findByIdAndDelete({ _id: id })
+        if (!userExist) {
+            return res.send({ message: "User not found " })
         }
 
-        res.send({message:"User Deleted Successfully "})
-        
+        res.send({ message: "User Deleted Successfully " })
+
     }
-    catch(err){
+    catch (err) {
         res.send(err)
     }
 

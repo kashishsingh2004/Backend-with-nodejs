@@ -27,7 +27,7 @@ app.post('/register', async (req, res) => {
         res.send(err)
     }
 
-})
+});
 
 
 app.post('/login', async (req, res) => {
@@ -46,15 +46,15 @@ app.post('/login', async (req, res) => {
     catch (err) {
         res.send(err)
     }
-})
+});
 app.put('/update/:id', async (req, res) => {
     const { id } = req.params
-    const { email, name, password,newPassword } = req.body
+    const { email, name, password, newPassword } = req.body
     try {
         const userExist = await User.findById({ _id: id })
         const realpassword = await bcrypt.compare(password, userExist.password)
         if (!userExist || !realpassword) {
-                return res.send({ message: "User not found" })
+            return res.send({ message: "User not found" })
         }
         const newpassword = await bcrypt.hash(newPassword, 10)
         userExist.email = email;
